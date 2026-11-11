@@ -24,7 +24,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 bat '"C:\\Users\\User\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" build -t online-quiz:latest .'
-                }
             }
         }
     }
