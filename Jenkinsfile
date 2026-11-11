@@ -2,6 +2,12 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "online-quiz"
+        DOCKER = "C:\\Users\\User\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe"
+        KUBECTL = "C:\\Users\\User\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\kubectl.exe"
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -23,7 +29,16 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat '"C:\\Users\\User\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" build -t online-quiz:latest .'
+                bat '"%DOCKER%" build -t %IMAGE_NAME%:%BUILD_NUMBER% .'
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                bat '"%DOCKER%" tag %IMAGE_NAME%:%BUILD_NUMBER% %IMAGE_NAME%:latest'
+                bat '"%KUBECTL%" apply -f deployment.yaml'
+                bat '"%KUBECTL%" rollout restart deployment/online-quiz-deployment'
+                bat '"%KUBECTL%" rollout status deployment/online-quiz-deployment'
             }
         }
     }
