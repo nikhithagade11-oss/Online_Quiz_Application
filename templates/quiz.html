@@ -1,0 +1,35 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Quiz</title>
+</head>
+<body>
+
+    <h1>Online Quiz Application</h1>
+    <h2>Answer the following questions</h2>
+
+    <form action="/result" method="POST">
+
+        {% for question in questions %}
+            {% set question_number = loop.index0 %}
+
+            <h3>{{ question.question }}</h3>
+
+            {% for option in question.options %}
+                <input type="radio"
+                       name="{{ question_number }}"
+                       value="{{ option }}"
+                       required>
+                {{ option }} <br>
+            {% endfor %}
+
+        {% endfor %}
+
+        <br>
+        <button type="submit">Submit Quiz</button>
+
+    </form>
+
+</body>
+</html>
