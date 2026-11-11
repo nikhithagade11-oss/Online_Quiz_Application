@@ -20,5 +20,11 @@ pipeline {
                 bat '"C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python315\\python.exe" -m pytest -v'
             }
         }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t online-quiz:latest .'
+            }
+        }
     }
 }
