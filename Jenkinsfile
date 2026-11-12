@@ -35,9 +35,8 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                bat '"%DOCKER%" tag %IMAGE_NAME%:%BUILD_NUMBER% %IMAGE_NAME%:latest'
                 bat '"%KUBECTL%" apply -f deployment.yaml'
-                bat '"%KUBECTL%" rollout restart deployment/online-quiz-deployment'
+                bat '"%KUBECTL%" set image deployment/online-quiz-deployment online-quiz=%IMAGE_NAME%:%BUILD_NUMBER%'
                 bat '"%KUBECTL%" rollout status deployment/online-quiz-deployment'
             }
         }
