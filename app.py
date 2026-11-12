@@ -33,6 +33,7 @@ def quiz():
 @app.route("/result", methods=["POST"])
 def result():
     question_ids = session.pop("question_ids", [])
+    print("Questions IDs received:",question_ids)
     questions = get_questions_by_ids(question_ids)
 
     score = 0
