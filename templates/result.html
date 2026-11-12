@@ -1,4 +1,4 @@
-
+ 
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,7 +10,42 @@
 
     <h2>Your Score: {{ score }} / {{ total }}</h2>
 
+    {% if score == total %}
+        <h2>Excellent! 🎉 All answers are correct!</h2>
+    {% elif score >= 3 %}
+        <h2>Good Job! 👍 Keep Practicing!</h2>
+    {% else %}
+        <h2>Needs Improvement! 📚 Don't Give Up!</h2>
+    {% endif %}
+
+    <hr>
+
+    <h2>Answer Review</h2>
+
+    {% for item in review %}
+        <h3>{{ loop.index }}. {{ item.question }}</h3>
+
+        {% if item.is_correct %}
+            <p style="color: green;">
+                Correct! Your answer: {{ item.selected }}
+            </p>
+        {% else %}
+            <p style="color: red;">
+                Incorrect! Your answer: {{ item.selected }}
+            </p>
+            <p>
+                Correct answer: {{ item.answer }}
+            </p>
+        {% endif %}
+
+        <hr>
+    {% endfor %}
+
     <a href="/quiz">Try Again</a>
+
+    <br><br>
+
+    <a href="/history">View Quiz History</a>
 
 </body>
 </html>

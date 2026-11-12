@@ -1,64 +1,84 @@
+from flask import Flask, render_template, request, session
+import sqlite3
+from database import (
+    create_database,
+    insert_questions,
+    get_questions,
+    get_random_questions,
+    get_questions_by_ids,
+    get_results
+)
 
-from flask import Flask, render_template, request
 
 app = Flask(__name__)
+app.secret_key = "quiz-secret-key"
 
-questions = [
-    {
-        "question": "1. Which language is used for web development?",
-        "options": ["Python", "HTML", "C", "All of these"],
-        "answer": "All of these"
-    },
-    {
-        "question": "2. Which keyword is used to define a function in Python?",
-        "options": ["function", "def", "fun", "define"],
-        "answer": "def"
-    },
-    {
-        "question": "3. What does CPU stand for?",
-        "options": [
-            "Central Processing Unit",
-            "Computer Personal Unit",
-            "Central Program Utility",
-            "Control Processing User"
-        ],
-        "answer": "Central Processing Unit"
-    },
-    {
-        "question": "4. Which data type stores True or False?",
-        "options": ["int", "float", "bool", "str"],
-        "answer": "bool"
-    },
-    {
-        "question": "5. Which company developed Python?",
-        "options": ["Microsoft", "Google", "Guido van Rossum", "Apple"],
-        "answer": "Guido van Rossum"
-    }
-]
+# Initialize database
+create_database()
+insert_questions()
+
 
 @app.route("/")
 def home():
     return "Welcome to Online Quiz Application!"
-
 @app.route("/quiz")
 def quiz():
-    return render_template("quiz.html", questions=questions)
+    questions = get_random_questions()
 
+    session["question_ids"] = [
+        question["id"] for question in questions
+    ]
+
+    return render_template("quiz.html", questions=questions)
 @app.route("/result", methods=["POST"])
 def result():
+    question_ids = session.pop("question_ids", [])
+    questions = get_questions_by_ids(question_ids)
+
     score = 0
+    review = []
 
     for i, question in enumerate(questions):
         selected = request.form.get(str(i))
 
-        if selected == question["answer"]:
+        is_correct = selected == question["answer"]
+
+        if is_correct:
             score += 1
+
+        review.append({
+            "question": question["question"],
+            "selected": selected,
+            "answer": question["answer"],
+            "is_correct": is_correct
+        })
+
+    connection = sqlite3.connect("quiz.db")
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        INSERT INTO results (score, total)
+        VALUES (?, ?)
+    """, (score, len(questions)))
+
+    connection.commit()
+    connection.close()
 
     return render_template(
         "result.html",
         score=score,
-        total=len(questions)
+        total=len(questions),
+        review=review
     )
+
+
+
+
+@app.route("/history")
+def history():
+    results = get_results()
+    return render_template("history.html", results=results)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

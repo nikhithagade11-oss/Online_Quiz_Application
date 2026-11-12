@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz History</title>
+</head>
+<body>
+
+    <h1>Previous Quiz Results</h1>
+
+    {% if results %}
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Score</th>
+                <th>Total</th>
+                <th>Date</th>
+            </tr>
+
+            {% for result in results %}
+                <tr>
+                    <td>{{ result[0] }}</td>
+                    <td>{{ result[1] }}</td>
+                    <td>{{ result[2] }}</td>
+                    <td>{{ result[3] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+    {% else %}
+        <p>No quiz results available.</p>
+    {% endif %}
+
+    <br>
+    <a href="/quiz">Take Quiz Again</a>
+
+</body>
+</html>
